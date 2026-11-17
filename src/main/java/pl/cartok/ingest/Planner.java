@@ -21,7 +21,7 @@ import java.util.Map;
 final class Planner {
 
 	private static final String DEMAND = "select make, model, weight from preference_demand";
-
+//fsdfs
 	private static final String ACTIVE_LISTINGS = """
 			select lower(make) as make, lower(model) as model, count(*) as amount
 			from listing where status = 'active' and make <> ''
