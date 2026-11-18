@@ -59,18 +59,11 @@ final class TelegramBot {
 	}
 
 	/**
-	 * Временно отвечает chat id любому сообщению, чтобы его можно было вписать в TELEGRAM_CHAT_IDS.
-	 * Команды и проверка списка — в комментарии ниже, вернуть после того как id известен.
+	 * Разбирает update и, если чат свой, отправляет ответ.
+	 * null — отвечать в чат некому (служебный update или чужой chat_id).
 	 */
 	String answer(Connection connection, JsonNode update) throws SQLException, IOException {
 		JsonNode message = update == null ? null : update.get("message");
-		if (message == null) return null;
-		long chatId = message.path("chat").path("id").asLong(0);
-		if (chatId == 0) return null;
-		String text = Long.toString(chatId);
-		send(chatId, text);
-		return text;
-		/*
 		if (message == null || !message.hasNonNull("text")) return null;
 		long chatId = message.path("chat").path("id").asLong(0);
 		if (!config.telegramChatIds.contains(chatId)) {
@@ -80,7 +73,6 @@ final class TelegramBot {
 		String text = reply(connection, message.path("text").asText(""));
 		send(chatId, text);
 		return text;
-		*/
 	}
 
 	private String reply(Connection connection, String text) throws SQLException {
@@ -162,8 +154,7 @@ final class TelegramBot {
 	}
 
 	private void send(long chatId, String text) throws IOException {
-		// Временно пускаем любой чат, иначе ответ с id не уйдёт. Вернуть вместе с answer().
-		// if (!config.telegramChatIds.contains(chatId)) throw new IOException("Чат не в списке");
+		if (!config.telegramChatIds.contains(chatId)) throw new IOException("Чат не в списке");
 		ObjectNode body = JSON.createObjectNode();
 		body.put("chat_id", chatId);
 		body.put("text", text);
